@@ -1,4 +1,4 @@
---PedCustomizationMenu version 0.1.0
+--PedCustomizationMenu version 1.0.0
 
 PedMenu = { }
 
@@ -489,6 +489,9 @@ end
 
 ---
 -- Draws a combobox button. You can pass an initial selected value if you have a stored state.
+-- You must click to save the option
+--
+-- Note: use either PedMenu.SelectList or PedMenu.ComboBox. Don't use both because you can confuse the user!
 --
 -- @param text					- text of the button.
 -- @param items					- list of items to be displayed. (the values will be printed to the interface)
@@ -522,7 +525,7 @@ function PedMenu.ComboBox(text, items, callback, initialSelectedValue)
 
 	local optionWasSelected = PedMenu.Button(text, selectedItem, function()
 		selectedIndex = currentIndex
-		callback(selectedIndex, selectedItem)
+		callback(selectedIndex, items[currentIndex])
 		return true
 	end)
 
@@ -538,6 +541,63 @@ function PedMenu.ComboBox(text, items, callback, initialSelectedValue)
 	menus[currentMenu].state[currentDrawingOption].currentIndex = currentIndex
 	menus[currentMenu].state[currentDrawingOption].selectedIndex = selectedIndex
 	return optionWasSelected
+end
+
+---
+-- Draws a selectable list. You can pass an initial selected value if you have a stored state.
+-- The callback is executed as soon as you change the value
+--
+-- Note: use either PedMenu.SelectList or PedMenu.ComboBox. Don't use both because you can confuse the user!
+--
+-- @param text					- text of the button.
+-- @param items					- list of items to be displayed. (the values will be printed to the interface)
+-- @param callback(index, item)	- (optional) function executed if the button is clicked. This function recieves
+--								  as first argument the index of the selected item in the array and as second value
+--								  the item itself.
+-- @param initialSelectedValue	- (optional) initial selected index value for the array. 1 by default
+--
+-- @returns true if the button was clicked
+--
+function PedMenu.SelectList(text, items, callback, initialSelectedValue)
+	local currentDrawingOption = (optionCount + 1)
+	local isCurrent = menus[currentMenu].currentOption == (optionCount + 1)
+
+	if not menus[currentMenu].state[currentDrawingOption] then 
+		initialSelectedValue = (initialSelectedValue) and initialSelectedValue or 1 -- ninja skill to set the initial value to 1 if the argument passed is null
+		System:Debug('aaaaaaaaaaaaaaa ' .. tostring(currentDrawingOption)) 
+		menus[currentMenu].state[currentDrawingOption] = {}
+		menus[currentMenu].state[currentDrawingOption].currentIndex = initialSelectedValue
+		menus[currentMenu].state[currentDrawingOption].selectedIndex = initialSelectedValue
+	end
+
+	local currentIndex = menus[currentMenu].state[currentDrawingOption].currentIndex
+	local selectedIndex = menus[currentMenu].state[currentDrawingOption].selectedIndex
+	local itemsCount = #items
+	local selectedItem = items[currentIndex]
+
+	if itemsCount > 1 and isCurrent then
+		selectedItem = '← '..tostring(selectedItem)..' →'
+	end
+
+	PedMenu.Button(text, selectedItem)
+	local returnValue = false
+	if isCurrent then
+		if currentKey == keys.left then
+			if currentIndex > 1 then currentIndex = currentIndex - 1 else currentIndex = itemsCount end
+			callback(currentIndex, items[currentIndex])
+			returnValue = true
+		elseif currentKey == keys.right then
+			if currentIndex < itemsCount then currentIndex = currentIndex + 1 else currentIndex = 1 end
+			callback(currentIndex, items[currentIndex])
+			returnValue = true
+		end
+		selectedIndex = currentIndex
+	else
+		currentIndex = selectedIndex
+	end
+	menus[currentMenu].state[currentDrawingOption].currentIndex = currentIndex
+	menus[currentMenu].state[currentDrawingOption].selectedIndex = selectedIndex
+	return returnValue
 end
 
 ---

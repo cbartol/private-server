@@ -122,7 +122,8 @@ local function SubMenuFace()
 	--GenericVariationMenu(PED_VARIATION.FACE)
 	PedMenu.CheckBox('checkbox =D', function (bool) System:Debug('asdasdasdasdasd '.. tostring(bool))end, true)
 	local items = {'a','b', 'c'}
-	PedMenu.ComboBox('combo :c', items, function (index, item) System:Debug('zzzzz '.. tostring(index)..' '..item)end, 2)
+	PedMenu.ComboBox('combo :c', items, function (index, item) System:Debug('zzzzz ['.. tostring(index)..'] ['..item..']')end, 2)
+	PedMenu.SelectList('list :c', items, function (index, item) System:Debug('xxxxxx '.. tostring(index)..' '..item)end, 3)
 end
 
 local function SubMenuHead()

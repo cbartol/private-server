@@ -471,6 +471,8 @@ function PedMenu.CheckBox(text, callback, initialBoolValue)
 		menus[currentMenu].state[currentDrawingOption].bool = initialBoolValue
 	end
 
+	local bool = menus[currentMenu].state[currentDrawingOption].bool
+
 	local checked = 'Off'
 	if bool then
 		checked = 'On'

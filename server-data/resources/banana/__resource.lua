@@ -1,10 +1,21 @@
 resource_manifest_version '44febabe-d386-4d18-afbe-5e627f4af937'
 
+--[[
 client_scripts {
 	'debug.lua',
 	'Client/constants.lua',
 	'Client/Menus/generic-menu.lua',
 	'Client/Menus/clothes-menu.lua',
+	'Client/start-events.lua',
+	'Client/client-loop.lua'
+}
+--]]
+
+client_scripts {
+	'debug.lua',
+	'Client/constants.lua',
+	'Client/Generic-Menu/generic-menu.lua',
+	'Client/Generic-Menu/example-menu.lua',
 	'Client/start-events.lua',
 	'Client/client-loop.lua'
 }

@@ -1,3 +1,4 @@
+--[[
 playerClothes = {
 	{
 		componentId = PED_VARIATION.FACE, -- 0
@@ -60,6 +61,8 @@ playerClothes = {
 		textureId = 0
 	}
 }
+--]]
+
 
 Citizen.CreateThread(
 	function()
@@ -69,7 +72,9 @@ Citizen.CreateThread(
 		-- ###################################
 		System:SetDebugLevel(System.DEBUG_LEVEL.DEBUG)
 		System:SetGlobalOutput(System.DEBUG_OUTPUT.CLIENT_CONSOLE)
-		
+
+		TriggerServerEvent('getCharactersFromDB')
+
 		PedMenu.InitClothesMenu()
 
 
@@ -86,10 +91,10 @@ Citizen.CreateThread(
 				PedMenu.DisplayOpenedMenu()
 			elseif IsControlJustReleased(0, INPUT.INTERACTION_MENU) then --M by default
 				PedMenu.OpenMenu('clothes')
-			elseif IsControlJustReleased(0, INPUT.ATTACK) then --M by default
+			elseif IsControlJustReleased(0, INPUT.ATTACK) then 
 				local ped = GetPlayerPed(-1)
-				--SetEntityHealth(ped, 1)
-				SetPedToRagdoll(GetPlayerPed(-1), 1000, 1000, 0, 0, 0, 0)
+				SetEntityHealth(ped, 1)
+				--SetPedToRagdoll(GetPlayerPed(-1), 1000, 1000, 0, 0, 0, 0)
 			end
 
 			Citizen.Wait(0)

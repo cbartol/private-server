@@ -5,7 +5,7 @@ client_scripts {
 	'Client/constants.lua',
 	'Client/Generic-Menu/generic-menu.lua',
 	'Client/Generic-Menu/example-menu.lua',
-	'Client/start-events.lua',
+	'Client/playerData.lua',
 	'Client/client-loop.lua'
 }
 

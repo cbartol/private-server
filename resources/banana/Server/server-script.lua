@@ -16,7 +16,7 @@ local function getUserFromDB(name, setKickReason)
 	
 	-- get user from DB
 	local user = MySQL.Sync.fetchAll('SELECT * FROM User WHERE uniqueId=@id', {['@id'] = userId})
-	if #user > 0 then
+	if user and #user > 0 then
 		System:Info('[playerConnecting] Found user')
 		if user[1].banExpiresAt and user[1].banExpiresAt > (os.time()*1000) then
 			System:Error('THIS USER IS BANNED!!! KICK HIM!!!') -- I can't kick players :c
@@ -24,6 +24,7 @@ local function getUserFromDB(name, setKickReason)
 	else
 		MySQL.Async.execute('INSERT INTO User (uniqueId) VALUES(@id)', {['@id'] =userId })
 	end
+	System:Info("ehehehehehehehehehe")
 end
 
 local function getCharactersFromDB( )

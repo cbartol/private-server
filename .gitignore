@@ -1,2 +1,15 @@
-/*
-!/server-data/
+CitizenMP.Server.exe
+CitizenMP.Server.exe.config
+NLog.config
+/cache/
+/resources/\[local\]/
+/resources/\[*\]/
+/resources/fivem*
+/resources/runcode
+/run.cmd
+/server.cfg
+
+/resources/*
+
+!/resources/banana
+!/resources/warmenu

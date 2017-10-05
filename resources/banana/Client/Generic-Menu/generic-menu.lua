@@ -466,7 +466,6 @@ function PedMenu.CheckBox(text, callback, initialBoolValue)
 
 	-- init state value
 	if not menus[currentMenu].state[currentDrawingOption] then 
-		System:Debug('bbbbbbbbbbbbbb ' .. tostring(currentDrawingOption)) 
 		menus[currentMenu].state[currentDrawingOption] = {}
 		menus[currentMenu].state[currentDrawingOption].bool = initialBoolValue
 	end
@@ -508,7 +507,6 @@ function PedMenu.ComboBox(text, items, callback, initialSelectedValue)
 
 	if not menus[currentMenu].state[currentDrawingOption] then 
 		initialSelectedValue = (initialSelectedValue) and initialSelectedValue or 1 -- ninja skill to set the initial value to 1 if the argument passed is null
-		System:Debug('aaaaaaaaaaaaaaa ' .. tostring(currentDrawingOption)) 
 		menus[currentMenu].state[currentDrawingOption] = {}
 		menus[currentMenu].state[currentDrawingOption].currentIndex = initialSelectedValue
 		menus[currentMenu].state[currentDrawingOption].selectedIndex = initialSelectedValue
@@ -564,7 +562,6 @@ function PedMenu.SelectList(text, items, callback, initialSelectedValue)
 
 	if not menus[currentMenu].state[currentDrawingOption] then 
 		initialSelectedValue = (initialSelectedValue) and initialSelectedValue or 1 -- ninja skill to set the initial value to 1 if the argument passed is null
-		System:Debug('aaaaaaaaaaaaaaa ' .. tostring(currentDrawingOption)) 
 		menus[currentMenu].state[currentDrawingOption] = {}
 		menus[currentMenu].state[currentDrawingOption].currentIndex = initialSelectedValue
 		menus[currentMenu].state[currentDrawingOption].selectedIndex = initialSelectedValue
@@ -600,6 +597,96 @@ function PedMenu.SelectList(text, items, callback, initialSelectedValue)
 	return returnValue
 end
 
+
+--------------------------------------------------------------
+---------- Display and aux stuff for display method ----------
+--------------------------------------------------------------
+local lastSecond = 0
+local firsScrollSpeed = 210
+local fastScrollSpeed = 120
+local currScrollSpeed = firsScrollSpeed -- current scroll speed -> time in milliseconds
+
+local function canNavigate()
+	local timeNow = GetGameTimer()
+	if timeNow - lastSecond > currScrollSpeed  then
+		lastSecond = timeNow
+		return true
+	end
+	return false
+end
+
+local function getNavKey()
+	local localCurrentKey = nil
+	local timeNow = GetGameTimer()
+	if IsControlPressed(0, keys.down) then
+		if IsControlJustPressed(0, keys.down) then
+			localCurrentKey = keys.down; lastSecond = timeNow; currScrollSpeed = firsScrollSpeed;
+		elseif canNavigate() then
+			localCurrentKey = keys.down; currScrollSpeed = fastScrollSpeed;
+		end
+	elseif IsControlPressed(0, keys.up) then
+		if IsControlJustPressed(0, keys.up) then
+			localCurrentKey = keys.up; lastSecond = timeNow; currScrollSpeed = firsScrollSpeed;
+		elseif canNavigate() then
+			localCurrentKey = keys.up; currScrollSpeed = fastScrollSpeed;
+		end
+	elseif IsControlPressed(0, keys.left) then
+		if IsControlJustPressed(0, keys.left) then
+			localCurrentKey = keys.left; lastSecond = timeNow; currScrollSpeed = firsScrollSpeed;
+		elseif canNavigate() then
+			localCurrentKey = keys.left; currScrollSpeed = fastScrollSpeed;
+		end
+	elseif IsControlPressed(0, keys.right) then
+		if IsControlJustPressed(0, keys.right) then
+			localCurrentKey = keys.right; lastSecond = timeNow; currScrollSpeed = firsScrollSpeed;
+		elseif canNavigate() then
+			localCurrentKey = keys.right; currScrollSpeed = fastScrollSpeed;
+		end
+	elseif IsControlJustPressed(0, keys.select) then
+		localCurrentKey = keys.select; lastSecond = timeNow; currScrollSpeed = firsScrollSpeed;
+	elseif IsControlJustPressed(0, keys.back) then
+		localCurrentKey = keys.back; lastSecond = timeNow; currScrollSpeed = firsScrollSpeed;
+	end
+	return localCurrentKey;
+end
+
+local actions = {
+	[keys.down] = function()
+		PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+		if menus[currentMenu].currentOption < optionCount then
+			menus[currentMenu].currentOption = menus[currentMenu].currentOption + 1
+		else
+			menus[currentMenu].currentOption = 1
+		end
+	end,
+	[keys.up] = function()
+		PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+		if menus[currentMenu].currentOption > 1 then
+			menus[currentMenu].currentOption = menus[currentMenu].currentOption - 1
+		else
+			menus[currentMenu].currentOption = optionCount
+		end
+	end,
+	[keys.left] = function()
+		currentKey = keys.left
+	end,
+	[keys.right] = function()
+		currentKey = keys.right
+	end,
+	[keys.select] = function()
+		currentKey = keys.select
+	end,
+	[keys.back] = function()
+		--cleanCurrentMenuState() -- preserve the state until the menu is closed
+		if menus[menus[currentMenu].previousMenu] then
+			PlaySoundFrontend(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+			setMenuVisible(menus[currentMenu].previousMenu, true)
+		else
+			PedMenu.CloseMenu()
+		end
+	end
+}
+
 ---
 -- The developer is not required to call this function anymore.
 -- Draws everything to the screen.
@@ -615,37 +702,10 @@ function PedMenu.Display()
 			drawSubTitle()
 
 			currentKey = nil
+			local currKey = getNavKey()
 
-			if IsControlJustPressed(0, keys.down) then
-				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-
-				if menus[currentMenu].currentOption < optionCount then
-					menus[currentMenu].currentOption = menus[currentMenu].currentOption + 1
-				else
-					menus[currentMenu].currentOption = 1
-				end
-			elseif IsControlJustPressed(0, keys.up) then
-				PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-
-				if menus[currentMenu].currentOption > 1 then
-					menus[currentMenu].currentOption = menus[currentMenu].currentOption - 1
-				else
-					menus[currentMenu].currentOption = optionCount
-				end
-			elseif IsControlJustPressed(0, keys.left) then
-				currentKey = keys.left
-			elseif IsControlJustPressed(0, keys.right) then
-				currentKey = keys.right
-			elseif IsControlJustPressed(0, keys.select) then
-				currentKey = keys.select
-			elseif IsControlJustPressed(0, keys.back) then
-				--cleanCurrentMenuState() -- preserve the state until the menu is closed
-				if menus[menus[currentMenu].previousMenu] then
-					PlaySoundFrontend(-1, "BACK", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
-					setMenuVisible(menus[currentMenu].previousMenu, true)
-				else
-					PedMenu.CloseMenu()
-				end
+			if currKey ~= nil then
+				actions[currKey]() -- optimization to avoid the if else again
 			end
 
 			optionCount = 0
